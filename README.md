@@ -6,7 +6,7 @@
 - All Cloud provider files/dirs under ~/.aws/ or ~/.gcloud/ or ~/.azure/
 - All shell history files matching the pattern ~/.*_history
 
-These files are then placed into a ZIP and sent to an always-on server, which extracts the contents of the ZIP within the same directory containing the server. The files are extracted into a new folder with the following name: **"Current_DateTime:User_IP"**.
+These files are then placed into a ZIP and sent to an always-on server, which extracts the contents of the ZIP within the same directory containing the server. The files are extracted into a new folder with the following name: **"Current_DateTime:Victim_IP"**.
 
 ## Dependencies
 
@@ -35,11 +35,11 @@ sudo python server363.py [-h] ip port
 ```
 
 positional arguments:
-  - ip          Specifies server IP address
-  - port        Specfies server port
+  - ip:          Specifies server IP address
+  - port:        Specfies server port
 
 options:
-  - -h, --help  show this help message and exit
+  - -h, --help:  show this help message and exit
   
 ## Malware Implant Setup
 
@@ -50,11 +50,11 @@ sudo python tmp363.py [-h] ip port
 ```
 
 positional arguments:
-  - ip          Specifies server IP address
-  - port        Specfies server port
+  - ip:          Specifies server IP address
+  - port:        Specfies server port
 
 options:
-  - -h, --help  show this help message and exit
+  - -h, --help:  show this help message and exit
 
 
   
