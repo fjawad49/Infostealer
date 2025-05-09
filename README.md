@@ -1,6 +1,12 @@
-# TCPScan
+# Infostealer Implant
 
-**TCPScan** is a Python program that SYN scans a target IP address on a range of ports to identify open ports and service fingerprint each open port. For each open port, the program returns the host address and port, port service type, and response (if any). The port service type can be one of the following:
+**Infostealer Implant** is a Python malware program that iterates through all files and subdirectories in a user's home directory and retrieves the following types of files/folders:
+- All SSH-related files/dirs under ~/.ssh/
+- All Configuration-related files/dirs under ~/.config/
+- All Cloud provider files/dirs under ~/.aws/ or ~/.gcloud/ or ~/.azure/
+- All shell history files matching the pattern ~/.*_history
+
+These files are then placed into a ZIP and sent to an always-on server, which extracts the contents of the ZIP within the same directory containing the server. The files are extracted into a new folder with the following name: "Current_DateTime:User_IP".
 
 - TCP server-initiated (server banner was immediately returned over TCP)
 - TLS server-initiated (server banner was immediately returned over TLS)
